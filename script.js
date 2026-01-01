@@ -1,8 +1,9 @@
 // Shared script for login flow and dashboard file viewing.
-// Uses sessionStorage to track authentication state.
+// Uses sessionStorage to track authentication state and a global interaction delay.
 
 const AUTH_KEY = 'moonshine_auth'; // value 'cassandra' when authenticated
 const REQUIRED_PASSWORD = 'MOONSHINE'; // exact match required
+const INTERACTION_DELAY = 3000; // ms - 3 seconds loading between interactions
 
 document.addEventListener('DOMContentLoaded', () => {
   // Login page elements (if present)
@@ -23,17 +24,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initBtn.addEventListener('click', async () => {
-      // simulate connection initiation
+      // simulate connection initiation with 3s loading
       initBtn.disabled = true;
+      setLoading(true);
       connStatus.textContent = 'Initializing...';
       initBtn.textContent = 'Connecting…';
-      await delay(1200);
+      await delay(INTERACTION_DELAY);
+      setLoading(false);
       connStatus.textContent = 'Connected';
       initBtn.classList.add('hidden');
       showPasswordStep();
     });
 
-    passForm && passForm.addEventListener('submit', (e) => {
+    passForm && passForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       passError.classList.add('hidden');
       const pw = (document.getElementById('password').value || '').trim();
@@ -41,11 +44,23 @@ document.addEventListener('DOMContentLoaded', () => {
         showError('Please enter a password.');
         return;
       }
+
+      // show loading before validating
+      setLoading(true);
+      connStatus && (connStatus.textContent = 'Authenticating...');
+      await delay(INTERACTION_DELAY);
+
       if (pw === REQUIRED_PASSWORD) {
         // success
         sessionStorage.setItem(AUTH_KEY, 'cassandra');
+        setLoading(false);
+        // small finalization delay before welcome to match "between each interaction"
+        setLoading(true);
+        await delay(INTERACTION_DELAY);
+        setLoading(false);
         showWelcome();
       } else {
+        setLoading(false);
         // Modified incorrect password message per user request
         showError('Incorrect Password. Authorities have been informed.');
       }
@@ -75,6 +90,15 @@ document.addEventListener('DOMContentLoaded', () => {
       initBtn.disabled = false;
       initBtn.textContent = 'Initiate connection';
     });
+
+    // Intercept Enter Dashboard to add loading delay before navigating
+    enterDash?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      setLoading(true);
+      await delay(INTERACTION_DELAY);
+      setLoading(false);
+      window.location.href = 'dashboard.html';
+    });
   }
 
   // Dashboard page protection & file viewer
@@ -101,7 +125,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const btn = e.target.closest('button[data-path]');
       if (!btn) return;
       const path = btn.getAttribute('data-path');
+      // 3s loading before fetching
+      setLoading(true);
+      if (viewer) viewer.textContent = 'Loading…';
+      await delay(INTERACTION_DELAY);
       await openFile(path);
+      setLoading(false);
     });
   }
 });
@@ -109,6 +138,11 @@ document.addEventListener('DOMContentLoaded', () => {
 // small helpers
 
 function delay(ms){ return new Promise(res => setTimeout(res, ms)); }
+
+function setLoading(on){
+  if (on) document.body.classList.add('loading');
+  else document.body.classList.remove('loading');
+}
 
 function showPasswordStep(){
   const stepPass = document.getElementById('step-pass');
@@ -148,14 +182,12 @@ async function openFile(path){
   const viewer = document.getElementById('viewerContainer');
   const downloadLink = document.getElementById('downloadLink');
   if (!viewer) return;
-  viewer.textContent = 'Loading…';
   try {
     const res = await fetch(path, {cache: "no-store"});
     if (!res.ok) throw new Error('Not found');
-    const contentType = res.headers.get('Content-Type') || '';
-    let text = await res.text();
+    const text = await res.text();
 
-    // If HTML, show as text; optionally render. We'll show as preformatted text for safety.
+    // Show content as preformatted text for safety.
     viewer.innerHTML = '';
     const pre = document.createElement('pre');
     pre.textContent = text;

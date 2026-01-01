@@ -3,14 +3,31 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MOONSHINE Login</title>
+  <title>AQUILLA CORPORATION - USADP</title>
   <meta name="description" content="Login flow — initiate connection then enter MOONSHINE." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="bg-black text-white">
+  <div class="background-decor" aria-hidden="true">
+    <div class="glow"></div>
+    <svg class="circles" viewBox="0 0 800 600" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="g1" x1="0" x2="1">
+          <stop offset="0%" stop-color="#061826" />
+          <stop offset="100%" stop-color="#00151f" />
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#g1)" />
+    </svg>
+  </div>
+
   <main class="page-center">
     <section class="card login-card" aria-labelledby="login-heading">
-      <h1 id="login-heading" class="brand">MOONSHINE ACCESS</h1>
+      <h1 id="login-heading" class="brand">AQUILLA CORPORATION - USADP</h1>
+
+      <p class="lead muted">Secure Access Portal</p>
 
       <div id="step-init" class="step">
         <p class="muted">Connection status: <strong id="conn-status">Disconnected</strong></p>
@@ -23,7 +40,7 @@
           <label for="password" class="sr-only">Password</label>
           <input id="password" name="password" type="password" inputmode="text" placeholder="Password" aria-required="true" />
           <div class="row">
-            <button type="submit" class="btn">Submit</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
             <button type="button" id="resetBtn" class="btn btn-ghost">Reset</button>
           </div>
         </form>
