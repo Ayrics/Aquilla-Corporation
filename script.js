@@ -1,190 +1,125 @@
-// Shared script for login flow and dashboard file viewing.
-// Uses sessionStorage to track authentication state and a global interaction delay.
+// Lightweight client-side behavior for demo accessibility and lockout logic
+(function(){
+  const yearEls = document.querySelectorAll('#year, #year-footer');
+  yearEls.forEach(el => el && (el.textContent = new Date().getFullYear()));
 
-const AUTH_KEY = 'moonshine_auth'; // value 'cassandra' when authenticated
-const REQUIRED_PASSWORD = 'MOONSHINE'; // exact match required
-const INTERACTION_DELAY = 3000; // ms - 3 seconds loading between interactions
+  // Respect prefers-reduced-motion at runtime (for dynamic JS-driven motion)
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Login page elements (if present)
-  const initBtn = document.getElementById('initBtn');
-  const connStatus = document.getElementById('conn-status');
-  const passForm = document.getElementById('passForm');
-  const passError = document.getElementById('passError');
-  const logoutAfter = document.getElementById('logoutAfter');
-  const enterDash = document.getElementById('enterDash');
+  // Skeleton loader: reveal content after simulated load
+  function revealSkeleton() {
+    const skeletons = document.querySelectorAll('[data-skeleton]');
+    skeletons.forEach(skel => {
+      const content = skel.parentElement.querySelector('.content');
+      // Short-circuit if already revealed
+      if (!content || !content.classList.contains('hidden')) return;
 
-  if (initBtn) {
-    // If user is already authenticated, skip to welcome
-    if (sessionStorage.getItem(AUTH_KEY) === 'cassandra') {
-      showWelcome();
+      // Simulated network delay - shorter if reduced motion is preferred
+      const delay = reduceMotion ? 200 : 900;
+
+      setTimeout(() => {
+        skel.setAttribute('aria-hidden', 'true');
+        skel.classList.add('hidden');
+        content.classList.remove('hidden');
+        content.removeAttribute('aria-hidden');
+        const status = document.getElementById('status-region');
+        if (status) status.textContent = 'Dashboard loaded.';
+      }, delay);
+    });
+  }
+
+  // Simple lockout mechanism on login form (client-side demo only)
+  function initAuthLockout() {
+    const form = document.getElementById('login-form');
+    const status = document.getElementById('auth-status');
+    if (!form || !status) return;
+
+    const KEY = 'aq_auth_failures_v1';
+    const MAX_ATTEMPTS = 5;
+    const LOCK_MINUTES = 5; // minutes
+
+    function getState(){
+      try{
+        return JSON.parse(localStorage.getItem(KEY)) || {fails:0, lockedUntil:null};
+      } catch(e){return {fails:0, lockedUntil:null};}
     }
 
-    initBtn.addEventListener('click', async () => {
-      initBtn.disabled = true;
-      setLoading(true);
-      connStatus.textContent = 'Initializing...';
-      initBtn.textContent = 'Connecting…';
-      await delay(INTERACTION_DELAY);
-      setLoading(false);
-      connStatus.textContent = 'Connected';
-      initBtn.classList.add('hidden');
-      showPasswordStep();
-    });
+    function setState(s){localStorage.setItem(KEY, JSON.stringify(s));}
 
-    passForm && passForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      passError.classList.add('hidden');
-      const pw = (document.getElementById('password').value || '').trim();
-      if (!pw) {
-        showError('Please enter a password.');
+    function failedAttempt(){
+      const s = getState();
+      s.fails = (s.fails || 0) + 1;
+      if (s.fails >= MAX_ATTEMPTS){
+        s.lockedUntil = Date.now() + LOCK_MINUTES * 60 * 1000;
+        s.fails = 0; // reset counter after lock
+      }
+      setState(s);
+      updateStatus();
+    }
+
+    function resetAttempts(){
+      setState({fails:0, lockedUntil:null});
+      updateStatus();
+    }
+
+    function updateStatus(){
+      const s = getState();
+      if (s.lockedUntil && Date.now() < s.lockedUntil){
+        const remaining = Math.ceil((s.lockedUntil - Date.now())/1000);
+        status.hidden = false;
+        status.textContent = `Too many failed attempts. Try again in ${remaining} seconds.`;
+        // disable form controls
+        Array.from(form.elements).forEach(el => el.disabled = true);
+        // countdown to re-enable
+        setTimeout(updateStatus, 1000);
+      } else {
+        status.hidden = true;
+        Array.from(form.elements).forEach(el => el.disabled = false);
+        // clear any stale lock
+        if (s.lockedUntil) resetAttempts();
+      }
+    }
+
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const state = getState();
+      if (state.lockedUntil && Date.now() < state.lockedUntil){
+        updateStatus();
         return;
       }
 
-      setLoading(true);
-      connStatus && (connStatus.textContent = 'Authenticating...');
-      await delay(INTERACTION_DELAY);
-
-      if (pw === REQUIRED_PASSWORD) {
-        sessionStorage.setItem(AUTH_KEY, 'cassandra');
-        setLoading(false);
-        setLoading(true);
-        await delay(INTERACTION_DELAY);
-        setLoading(false);
-        showWelcome();
+      // Demo: treat any password that isn't literally "password" as a failure
+      const pwd = form.querySelector('#password').value || '';
+      if (pwd === 'password'){
+        // simulated success
+        status.hidden = false;
+        status.textContent = 'Signed in — redirecting to dashboard...';
+        // small delay then navigate (if on index)
+        setTimeout(() => { if (location.pathname.endsWith('index.html') || location.pathname === '/') location.href = '/dashboard.html'; }, 700);
       } else {
-        setLoading(false);
-        showError('Incorrect Password. Authorities have been informed.');
+        failedAttempt();
+        // provide immediate screenreader feedback
+        status.hidden = false;
+        status.textContent = 'Incorrect credentials. Please try again.';
       }
     });
 
-    document.getElementById('resetBtn')?.addEventListener('click', () => {
-      document.getElementById('password').value = '';
-      passError.classList.add('hidden');
-      document.getElementById('step-pass')?.classList.add('hidden');
-      document.getElementById('step-init')?.classList.remove('hidden');
-      initBtn.classList.remove('hidden');
-      initBtn.disabled = false;
-      connStatus.textContent = 'Disconnected';
-      initBtn.textContent = 'Initiate connection';
-    });
+    updateStatus();
+  }
 
-    logoutAfter?.addEventListener('click', () => {
-      sessionStorage.removeItem(AUTH_KEY);
-      document.getElementById('password').value = '';
-      passError.classList.add('hidden');
-      document.getElementById('step-welcome')?.classList.add('hidden');
-      document.getElementById('step-init')?.classList.remove('hidden');
-      connStatus.textContent = 'Disconnected';
-      initBtn.classList.remove('hidden');
-      initBtn.disabled = false;
-      initBtn.textContent = 'Initiate connection';
-    });
-
-    enterDash?.addEventListener('click', async (e) => {
-      e.preventDefault();
-      setLoading(true);
-      await delay(INTERACTION_DELAY);
-      setLoading(false);
-      window.location.href = 'dashboard.html';
+  // small helper to announce status changes for screen readers
+  function initLiveRegion(){
+    const liveEls = document.querySelectorAll('[aria-live]');
+    liveEls.forEach(el => {
+      // ensure they are focusable for assistive tech if needed
+      if (!el.getAttribute('role')) el.setAttribute('role', 'status');
     });
   }
 
-  // Dashboard page protection & file viewer
-  const logoutBtn = document.getElementById('logout');
-  const fileItems = document.getElementById('fileItems');
-  const viewer = document.getElementById('viewerContainer');
-  const downloadLink = document.getElementById('downloadLink');
-
-  if (logoutBtn) {
-    if (sessionStorage.getItem(AUTH_KEY) !== 'cassandra') {
-      window.location.href = 'index.html';
-      return;
-    }
-
-    logoutBtn.addEventListener('click', () => {
-      sessionStorage.removeItem(AUTH_KEY);
-      window.location.href = 'index.html';
-    });
-
-    // file click handling
-    fileItems?.addEventListener('click', async (e) => {
-      const btn = e.target.closest('button[data-path]');
-      if (!btn) return;
-      const path = btn.getAttribute('data-path');
-      setLoading(true);
-      if (viewer) viewer.textContent = 'Loading…';
-      await delay(INTERACTION_DELAY);
-      await openFile(path);
-      setLoading(false);
-    });
+  // init on DOM ready
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', () => { revealSkeleton(); initAuthLockout(); initLiveRegion(); });
+  } else {
+    revealSkeleton(); initAuthLockout(); initLiveRegion();
   }
-});
-
-// small helpers
-
-function delay(ms){ return new Promise(res => setTimeout(res, ms)); }
-
-function setLoading(on){
-  if (on) document.body.classList.add('loading');
-  else document.body.classList.remove('loading');
-}
-
-function showPasswordStep(){
-  const stepPass = document.getElementById('step-pass');
-  const stepInit = document.getElementById('step-init');
-  if (stepPass && stepInit) {
-    stepInit.classList.add('hidden');
-    stepPass.classList.remove('hidden');
-    stepPass.removeAttribute('aria-hidden');
-    const pw = document.getElementById('password');
-    if (pw) pw.focus();
-  }
-}
-
-function showWelcome(){
-  const stepPass = document.getElementById('step-pass');
-  const stepWelcome = document.getElementById('step-welcome');
-  const stepInit = document.getElementById('step-init');
-  if (stepPass) stepPass.classList.add('hidden');
-  if (stepInit) stepInit.classList.add('hidden');
-  if (stepWelcome) {
-    stepWelcome.classList.remove('hidden');
-    stepWelcome.removeAttribute('aria-hidden');
-  }
-}
-
-// show error text
-function showError(msg){
-  const passError = document.getElementById('passError');
-  if (passError) {
-    passError.textContent = msg;
-    passError.classList.remove('hidden');
-  }
-}
-
-// Dashboard file viewer fetch
-async function openFile(path){
-  const viewer = document.getElementById('viewerContainer');
-  const downloadLink = document.getElementById('downloadLink');
-  if (!viewer) return;
-  try {
-    const res = await fetch(path, {cache: "no-store"});
-    if (!res.ok) throw new Error('Not found');
-    const text = await res.text();
-
-    viewer.innerHTML = '';
-    const pre = document.createElement('pre');
-    pre.textContent = text;
-    pre.style.whiteSpace = 'pre-wrap';
-    pre.style.wordBreak = 'break-word';
-    viewer.appendChild(pre);
-
-    downloadLink.href = path;
-    downloadLink.download = path.split('/').pop();
-    downloadLink.classList.remove('hidden');
-  } catch (err) {
-    viewer.textContent = 'Failed to load file.';
-    downloadLink.classList.add('hidden');
-  }
-}
+})();

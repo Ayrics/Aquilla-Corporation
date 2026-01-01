@@ -1,67 +1,67 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AQUILLA CORPORATION - USADP</title>
-  <meta name="description" content="Login flow — initiate connection then enter MOONSHINE." />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Aquilla Corporation — Welcome</title>
+  <link rel="icon" href="/favicon.ico">
+  <meta name="description" content="Aquilla Corporation dashboard and public landing page">
+  <link rel="stylesheet" href="/styles.css">
 </head>
-<body class="bg-black text-white">
-  <div class="background-decor" aria-hidden="true">
-    <div class="glow"></div>
-    <svg class="circles" viewBox="0 0 800 600" preserveAspectRatio="none" aria-hidden="true">
-      <defs>
-        <linearGradient id="g1" x1="0" x2="1">
-          <stop offset="0%" stop-color="#061826" />
-          <stop offset="100%" stop-color="#00151f" />
-        </linearGradient>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#g1)" />
-    </svg>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-    <!-- optional watermark (if images/logo.png exists in repo) -->
-    <img src="images/logo.png" alt="" class="logo-watermark" />
-  </div>
+  <header class="site-header" role="banner">
+    <div class="container header-inner">
+      <h1 class="brand">Aquilla Corporation</h1>
+      <nav aria-label="Primary navigation">
+        <ul class="nav-list">
+          <li><a href="/index.html">Home</a></li>
+          <li><a href="/dashboard.html">Dashboard</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
 
-  <main class="page-center">
-    <section class="card login-card" aria-labelledby="login-heading">
-      <h1 id="login-heading" class="brand">AQUILLA CORPORATION - USADP</h1>
+  <main id="main" class="container" role="main">
+    <section class="hero" aria-labelledby="hero-heading">
+      <h2 id="hero-heading">Secure, performant dashboards — built for people</h2>
+      <p class="lead">Accessible by design. Fast by default. Polished for clarity.</p>
+    </section>
 
-      <p class="lead muted">Secure Access Portal</p>
+    <section class="auth-card" aria-labelledby="auth-heading">
+      <h3 id="auth-heading">Sign in to your dashboard</h3>
 
-      <div id="step-init" class="step">
-        <p class="muted">Connection status: <strong id="conn-status">Disconnected</strong></p>
-        <button id="initBtn" class="btn btn-primary" aria-controls="conn-status">Initiate connection</button>
-      </div>
+      <form id="login-form" class="login-form" aria-describedby="auth-help">
+        <label for="username">Username</label>
+        <input id="username" name="username" autocomplete="username" required>
 
-      <div id="step-pass" class="step hidden" aria-hidden="true">
-        <p class="muted">Connection initialised. Enter password to continue.</p>
-        <form id="passForm" autocomplete="off">
-          <label for="password" class="sr-only">Password</label>
-          <input id="password" name="password" type="password" inputmode="text" placeholder="Password" aria-required="true" />
-          <div class="row">
-            <button type="submit" class="btn btn-primary">Submit</button>
-            <button type="button" id="resetBtn" class="btn btn-ghost">Reset</button>
-          </div>
-        </form>
-        <p id="passError" class="error hidden" role="alert"></p>
-      </div>
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
 
-      <div id="step-welcome" class="step hidden" aria-hidden="true">
-        <p class="muted">Authentication successful.</p>
-        <p class="welcome">Welcome, Cassandra Winters.</p>
-        <div class="row">
-          <a id="enterDash" class="btn btn-primary" href="dashboard.html">Enter Dashboard</a>
-          <button id="logoutAfter" class="btn btn-ghost">Log out</button>
-        </div>
-      </div>
+        <button id="login-btn" type="submit">Sign in</button>
+        <p id="auth-help" class="help">Enter any credentials — this demo will simulate lockouts after failed attempts.</p>
+      </form>
 
+      <div id="auth-status" aria-live="polite" class="status" hidden></div>
+    </section>
+
+    <section class="features">
+      <h3>Quick demo features</h3>
+      <ul>
+        <li>Skeleton loading states for faster perceived performance</li>
+        <li>Reduced-motion preference respected</li>
+        <li>Accessible live status and skip link</li>
+      </ul>
     </section>
   </main>
 
-  <script src="script.js" defer></script>
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <small>&copy; <span id="year"></span> Aquilla Corporation</small>
+    </div>
+  </footer>
+
+  <script src="/script.js" defer></script>
 </body>
 </html>
