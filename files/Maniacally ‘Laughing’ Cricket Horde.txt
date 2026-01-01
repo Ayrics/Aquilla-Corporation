@@ -1,0 +1,3 @@
+Maniacally ‘Laughing’ Cricket Horde
+
+Short field report describing a swarm behavior — placeholder text included for testing the viewer UI and download functionality.

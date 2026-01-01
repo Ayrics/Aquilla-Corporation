@@ -12,7 +12,7 @@
 <body class="bg-black text-white">
   <div class="background-decor" aria-hidden="true">
     <div class="glow"></div>
-    <svg class="circles" viewBox="0 0 800 600" preserveAspectRatio="none">
+    <svg class="circles" viewBox="0 0 800 600" preserveAspectRatio="none" aria-hidden="true">
       <defs>
         <linearGradient id="g1" x1="0" x2="1">
           <stop offset="0%" stop-color="#061826" />
@@ -21,6 +21,9 @@
       </defs>
       <rect width="100%" height="100%" fill="url(#g1)" />
     </svg>
+
+    <!-- optional watermark (if images/logo.png exists in repo) -->
+    <img src="images/logo.png" alt="" class="logo-watermark" />
   </div>
 
   <main class="page-center">
@@ -49,7 +52,7 @@
 
       <div id="step-welcome" class="step hidden" aria-hidden="true">
         <p class="muted">Authentication successful.</p>
-        <p class="welcome">Welcome, Cassandra.</p>
+        <p class="welcome">Welcome, Cassandra Winters.</p>
         <div class="row">
           <a id="enterDash" class="btn btn-primary" href="dashboard.html">Enter Dashboard</a>
           <button id="logoutAfter" class="btn btn-ghost">Log out</button>

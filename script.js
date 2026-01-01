@@ -9,11 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Login page elements (if present)
   const initBtn = document.getElementById('initBtn');
   const connStatus = document.getElementById('conn-status');
-  const stepPass = document.getElementById('step-pass');
-  const stepInit = document.getElementById('step-init');
   const passForm = document.getElementById('passForm');
   const passError = document.getElementById('passError');
-  const stepWelcome = document.getElementById('step-welcome');
   const logoutAfter = document.getElementById('logoutAfter');
   const enterDash = document.getElementById('enterDash');
 
@@ -24,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initBtn.addEventListener('click', async () => {
-      // simulate connection initiation with 3s loading
       initBtn.disabled = true;
       setLoading(true);
       connStatus.textContent = 'Initializing...';
@@ -45,33 +41,28 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // show loading before validating
       setLoading(true);
       connStatus && (connStatus.textContent = 'Authenticating...');
       await delay(INTERACTION_DELAY);
 
       if (pw === REQUIRED_PASSWORD) {
-        // success
         sessionStorage.setItem(AUTH_KEY, 'cassandra');
         setLoading(false);
-        // small finalization delay before welcome to match "between each interaction"
         setLoading(true);
         await delay(INTERACTION_DELAY);
         setLoading(false);
         showWelcome();
       } else {
         setLoading(false);
-        // Modified incorrect password message per user request
         showError('Incorrect Password. Authorities have been informed.');
       }
     });
 
     document.getElementById('resetBtn')?.addEventListener('click', () => {
-      // reset UI
       document.getElementById('password').value = '';
       passError.classList.add('hidden');
-      stepPass.classList.add('hidden');
-      stepInit.classList.remove('hidden');
+      document.getElementById('step-pass')?.classList.add('hidden');
+      document.getElementById('step-init')?.classList.remove('hidden');
       initBtn.classList.remove('hidden');
       initBtn.disabled = false;
       connStatus.textContent = 'Disconnected';
@@ -80,18 +71,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     logoutAfter?.addEventListener('click', () => {
       sessionStorage.removeItem(AUTH_KEY);
-      // reset to initial UI state
       document.getElementById('password').value = '';
       passError.classList.add('hidden');
-      stepWelcome.classList.add('hidden');
-      stepInit.classList.remove('hidden');
+      document.getElementById('step-welcome')?.classList.add('hidden');
+      document.getElementById('step-init')?.classList.remove('hidden');
       connStatus.textContent = 'Disconnected';
       initBtn.classList.remove('hidden');
       initBtn.disabled = false;
       initBtn.textContent = 'Initiate connection';
     });
 
-    // Intercept Enter Dashboard to add loading delay before navigating
     enterDash?.addEventListener('click', async (e) => {
       e.preventDefault();
       setLoading(true);
@@ -108,9 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const downloadLink = document.getElementById('downloadLink');
 
   if (logoutBtn) {
-    // protect route: redirect to index if not authenticated
     if (sessionStorage.getItem(AUTH_KEY) !== 'cassandra') {
-      // not authenticated — redirect to login
       window.location.href = 'index.html';
       return;
     }
@@ -125,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const btn = e.target.closest('button[data-path]');
       if (!btn) return;
       const path = btn.getAttribute('data-path');
-      // 3s loading before fetching
       setLoading(true);
       if (viewer) viewer.textContent = 'Loading…';
       await delay(INTERACTION_DELAY);
@@ -187,7 +173,6 @@ async function openFile(path){
     if (!res.ok) throw new Error('Not found');
     const text = await res.text();
 
-    // Show content as preformatted text for safety.
     viewer.innerHTML = '';
     const pre = document.createElement('pre');
     pre.textContent = text;
@@ -195,7 +180,6 @@ async function openFile(path){
     pre.style.wordBreak = 'break-word';
     viewer.appendChild(pre);
 
-    // enable download link
     downloadLink.href = path;
     downloadLink.download = path.split('/').pop();
     downloadLink.classList.remove('hidden');
