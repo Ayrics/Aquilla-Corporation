@@ -1,0 +1,59 @@
+:root{
+  --bg-black: #000;
+  --white: #fff;
+  --muted: #cfcfcf;
+  --accent: #7bd389;
+  --dark: #111;
+  --card-bg: #0f0f0f;
+  --radius: 10px;
+  --max-width: 900px;
+  --gap: 16px;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color-scheme: light dark;
+}
+
+/* Basic layout */
+*{box-sizing:border-box}
+html,body{height:100%}
+body.bg-black{background:var(--bg-black); color:var(--white)}
+body.bg-white{background: #fafafa; color: var(--dark)}
+.container{max-width:var(--max-width); margin:0 auto; padding:24px}
+
+/* Centered login */
+.page-center{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); padding:28px; border-radius:var(--radius); width:100%; max-width:520px; box-shadow:0 6px 30px rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.04)}
+.login-card .brand{letter-spacing:1px; font-size:1.25rem; margin:0 0 12px; text-align:center}
+.muted{color:var(--muted); margin:0 0 12px}
+.btn{background:transparent; color:inherit; border:1px solid rgba(255,255,255,0.12); padding:10px 14px; border-radius:8px; cursor:pointer; text-decoration:none; display:inline-block}
+.btn:hover{opacity:0.95}
+.btn-primary{background:var(--white); color:var(--dark); border:none}
+.btn-ghost{background:transparent; border:1px solid rgba(255,255,255,0.08)}
+.row{display:flex; gap:12px; margin-top:12px}
+.hidden{display:none}
+.error{color:#ff7b7b; margin-top:8px}
+.sr-only{position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden}
+
+/* Password Input */
+#password{width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); margin-top:8px; background:transparent; color:inherit; font-size:1rem}
+
+/* Welcome */
+.welcome{font-weight:700; font-size:1.1rem; margin:8px 0}
+
+/* Dashboard styles */
+.dash-header{background:#fff; border-bottom:1px solid #eee; padding:14px 0}
+.header-inner{display:flex; align-items:center; justify-content:space-between}
+.brand.small{font-size:1rem; margin:0}
+.dashboard{display:grid; grid-template-columns:1fr 1.4fr; gap:24px; padding:24px}
+.file-grid{list-style:none; padding:0; margin:12px 0; display:grid; gap:10px}
+.file-btn{display:block; width:100%; text-align:left; padding:10px 12px; border-radius:8px; background:#fff; border:1px solid #e6e6e6; cursor:pointer}
+.file-btn:hover{background:#f6f6f6}
+
+/* Viewer */
+.file-viewer .viewer{min-height:220px; background:#0b0b0b; color:#e9e9e9; padding:12px; border-radius:10px; overflow:auto}
+.viewer.empty{display:flex; align-items:center; justify-content:center; color:#9a9a9a}
+
+/* Responsive */
+@media (max-width:800px){
+  .dashboard{grid-template-columns:1fr; padding:12px}
+  .card{padding:20px}
+}

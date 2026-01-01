@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard — Files</title>
+  <meta name="description" content="Dashboard listing multiple files." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-white text-dark">
+  <header class="site-header dash-header">
+    <div class="container header-inner">
+      <h1 class="brand small">Cassandra — Dashboard</h1>
+      <div class="header-actions">
+        <button id="logout" class="btn btn-ghost">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container dashboard">
+    <section class="files-list" aria-labelledby="files-heading">
+      <h2 id="files-heading">Files</h2>
+      <p class="muted">Click a file to open it in the viewer.</p>
+      <ul id="fileItems" class="file-grid" role="list">
+        <li><button class="file-btn" data-path="files/document.txt">document.txt</button></li>
+        <li><button class="file-btn" data-path="files/notes.md">notes.md</button></li>
+        <li><button class="file-btn" data-path="files/secret.txt">secret.txt</button></li>
+        <li><button class="file-btn" data-path="files/project.html">project.html</button></li>
+      </ul>
+    </section>
+
+    <section class="file-viewer" aria-labelledby="viewer-heading">
+      <h2 id="viewer-heading">Viewer</h2>
+      <div id="viewerContainer" class="viewer empty">Select a file to view its contents.</div>
+      <a id="downloadLink" class="btn btn-primary hidden" download>Download file</a>
+    </section>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>

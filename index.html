@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MOONSHINE Login</title>
+  <meta name="description" content="Login flow — initiate connection then enter MOONSHINE." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-black text-white">
+  <main class="page-center">
+    <section class="card login-card" aria-labelledby="login-heading">
+      <h1 id="login-heading" class="brand">MOONSHINE ACCESS</h1>
+
+      <div id="step-init" class="step">
+        <p class="muted">Connection status: <strong id="conn-status">Disconnected</strong></p>
+        <button id="initBtn" class="btn btn-primary" aria-controls="conn-status">Initiate connection</button>
+      </div>
+
+      <div id="step-pass" class="step hidden" aria-hidden="true">
+        <p class="muted">Connection initialised. Enter password to continue.</p>
+        <form id="passForm" autocomplete="off">
+          <label for="password" class="sr-only">Password</label>
+          <input id="password" name="password" type="password" inputmode="text" placeholder="Password" aria-required="true" />
+          <div class="row">
+            <button type="submit" class="btn">Submit</button>
+            <button type="button" id="resetBtn" class="btn btn-ghost">Reset</button>
+          </div>
+        </form>
+        <p id="passError" class="error hidden" role="alert"></p>
+      </div>
+
+      <div id="step-welcome" class="step hidden" aria-hidden="true">
+        <p class="muted">Authentication successful.</p>
+        <p class="welcome">Welcome, Cassandra.</p>
+        <div class="row">
+          <a id="enterDash" class="btn btn-primary" href="dashboard.html">Enter Dashboard</a>
+          <button id="logoutAfter" class="btn btn-ghost">Log out</button>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
